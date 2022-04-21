@@ -14,28 +14,13 @@ class ScienceParser(AbsParser):
         # listParsLinks = self.ParsingLinks()
         # print(listParsLinks)
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-        asyncio.run(self.get_gather_data())
+        asyncio.run(self.get_page_data_links())
         
         finishTime = datetime.datetime.now() - startTime
         print(finishTime)
 
 
-    async def get_page_data_links(self, session, page):
-            
-            url_pages = f"https://habr.com/ru/hub/popular_science/page{page}/"
-            
-            async with session.get(url=url_pages, headers=self.headers) as response:
-                response_text = await response.text()
-                
-                soup = BeautifulSoup(response_text, "lxml")
-                
-                link_items = soup.find_all("a", class_="tm-article-snippet__title-link")
-                for item in link_items:
-                    self.list_links.append(item.get("href"))
-    
-            return self.list_links
-    
-    async def get_gather_data(self):
+    async def get_page_data_links(self):
         async with aiohttp.ClientSession() as session:
             # response = await session.get(url=self.urlScience, headers=self.headers)
             # soup = BeautifulSoup(await response.text(), "lxml")
@@ -43,14 +28,41 @@ class ScienceParser(AbsParser):
             tasks = []
             
             for page in range(1,3):
+                url_pages = f"https://habr.com/ru/hub/popular_science/page{page}/"
                 # print(f"{page} ////////////////////")
                 # task = asyncio.create_task(self.get_page_data_links(session, page))
-                listLinks = await self.get_page_data_links(session, page)
-                # tasks.append(task)
-                await asyncio.sleep(0.03)
+                async with session.get(url=url_pages, headers=self.headers) as response:
+                    
+                    response_text = await response.text()
+                    
+                    soup = BeautifulSoup(response_text, "lxml")
+                    
+                    link_items = soup.find_all("a", class_="tm-article-snippet__title-link")
+                    for item in link_items:
+                        self.list_links.append(item.get("href"))
+    
+                    # listLinks = await self.get_page_data_links(session, page)
+                    # tasks.append(task)
+                    await asyncio.sleep(0.03)
             
-            print(len(listLinks))
-            # await asyncio.gather(*tasks)         
+            print(self.list_links)
+            # await asyncio.gather(*tasks)   
+            
+            
+            
+            # async with session.get(url=url_pages, headers=self.headers) as response:
+            #     response_text = await response.text()
+                
+            #     soup = BeautifulSoup(response_text, "lxml")
+                
+            #     link_items = soup.find_all("a", class_="tm-article-snippet__title-link")
+            #     for item in link_items:
+            #         self.list_links.append(item.get("href"))
+    
+            return self.list_links
+    
+    async def get_gather_data(self):
+           pass   
 
     # def ParsingLinks(self):
 
