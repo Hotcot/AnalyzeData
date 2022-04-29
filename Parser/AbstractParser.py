@@ -6,13 +6,13 @@ import aiohttp
 
 class AbsParser:
     
-    list_links = [] # arr of links
-    list_title = [] # arr of titles
-    list_text = [] # arr fo Text
-    list_data_format_linux = [] # arr of Data format Linux
-    list_data_format_normal = [] # arr of Data normal format
+    links = [] # list of links
+    titles = [] # list of titles
+    texts = [] # list fo Text
+    data_format_linux = [] # list of Data format Linux
+    data_format_normal = [] # list of Data normal format
     
-    url_all = "https://habr.com/"
+    url_general = "https://habr.com"
     
     # agent for browser
     headers = {
@@ -20,7 +20,7 @@ class AbsParser:
         "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Mobile Safari/537.36 Edg/100.0.1185.36"
     }
     
-    def ParsingLinks():
+    async def get_page_link_articles():
         pass
     
     # def ParsingTitles():

@@ -1,3 +1,6 @@
 from Parser.ScienceParser import ScienceParser
+from Parser.InfSecurityParser import InfSecurityParser
 
-parser = ScienceParser()
+parserScience = ScienceParser()
+print("here ========================================================")
+# parserSecurity = InfSecurityParser()
