@@ -1,11 +1,14 @@
+from base64 import decode
 from requests import session
 from .AbstractParser import *
 import datetime
+import time
+
 
 class ScienceParser(AbsParser):
 
-    topic_article = "science"
-    url_science = "https://habr.com/ru/hub/popular_science/"  # link for parsing
+    __topic_article = "science" # Theme articles
+    __url_science = "https://habr.com/ru/hub/popular_science/"  # Link for parsing
     temp_counter = 0  # delete then
     
     def __init__(self):
@@ -16,10 +19,12 @@ class ScienceParser(AbsParser):
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())# потрібно для уникненння внутрішньої помилки при виклику асинхроної функції
         link_articles = asyncio.run(self.get_page_link_articles())
         
-        text_titles = asyncio.run(self.get_data_of_article(link_articles))
+        text_titles = asyncio.run(self.get_data_article(link_articles))
         
-        #очистка даних зі списків
-        self.clear_lists()
+        
+        self.__clear_lists() #clear data of global lists
+        
+        
         # ended work programm
         finishTime = datetime.datetime.now() - startTime
         print(finishTime)
@@ -32,7 +37,7 @@ class ScienceParser(AbsParser):
             # allLinksHref = soup.find_all("a", class_="tm-article-snippet__title-link")            
             
             for page in range(1,2):
-                url_pages = f"https://habr.com/ru/hub/popular_science/page{page}/"
+                url_pages = f"{self.__url_science}page{page}/"
                 # print(f"{page} ////////////////////")
                 # task = asyncio.create_task(self.get_page_data_links(session, page))
                 async with session.get(url=url_pages, headers=self.headers) as response:
@@ -44,39 +49,47 @@ class ScienceParser(AbsParser):
                     link_items = soup.find_all("a", class_="tm-article-snippet__title-link")
                     for item in link_items:
                         self.links.append(item.get("href"))
-                        print(item.get("href"))
-                    await asyncio.sleep(0.03) # задержка для предотвращения потерь данных с сайта (пропадают данные в общем)
+                        # print(item.get("href"))
+                    await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )
                     print(f"[INFO] Process page : {page} \n\n\n")
                     
             
             # print(self.list_links)    
             return self.links
         
-        
-    async def get_data_of_article(self, links):
+    # function for get full data of articles
+    async def get_data_article(self, links):
         
         async with aiohttp.ClientSession() as session:
             
             for article in links:
+                
                 url_article = f"{self.url_general}{article}"
                 
                 async with session.get(url=url_article, headers=self.headers) as response:
                     
-                    response_text = await response.text()                    
+                    response_text = await response.text()           
                     soup = BeautifulSoup(response_text, "lxml")
-                    self.get_title_of_article(soup)
-                    self.get_text_of_article(soup)
+                    # print(soup)
+                    self.__get_title_article(soup)
+                    self.__get_text_article(soup)
+                    self.__get_date_article(soup)
+                    # print(f"{url_article}  |  {self.titles}  |  {self.texts}  |  {self.data_time}")
+                    return 0
                     
                         
             
-    def clear_lists(self):
+    def __clear_lists(self):
         self.links.clear()
         
-    def get_title_of_article(self, soup):
+    def __get_title_article(self, soup):
         self.titles.append(soup.find("h1", class_="tm-article-snippet__title tm-article-snippet__title_h1").text)
-        return self.titles
     
-    def get_text_of_article(self, soup):
-        texts =  soup.find_all("p").text
+    def __get_text_article(self, soup):
+         self.texts.append(soup.find("div", {"id": "post-content-body"}).text)
+        
+    def __get_date_article(self, soup):
+         self.data_time.append(soup.find("time").get("datetime"))
+        
 
        

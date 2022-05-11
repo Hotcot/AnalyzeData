@@ -9,8 +9,8 @@ class AbsParser:
     links = [] # list of links
     titles = [] # list of titles
     texts = [] # list fo Text
-    data_format_linux = [] # list of Data format Linux
-    data_format_normal = [] # list of Data normal format
+    data_format_iso = [] # list of Data format Linux
+    data_time = [] # list of Data normal format
     
     url_general = "https://habr.com"
     
