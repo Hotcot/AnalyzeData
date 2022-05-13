@@ -2,6 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 import asyncio
 import aiohttp
+import csv
+
+import psycopg2
+from Models.config import host, user, password, db_name
 
 
 class AbsParser:
