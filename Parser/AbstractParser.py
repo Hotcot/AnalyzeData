@@ -5,6 +5,7 @@ import aiohttp
 import csv
 
 import psycopg2
+
 from Models.config import host, user, password, db_name
 
 
@@ -15,6 +16,7 @@ class AbsParser:
     texts = [] # list fo Text
     data_format_iso = [] # list of Data format Linux
     data_time = [] # list of Data normal format
+    tags = []
     
     url_general = "https://habr.com"
     
@@ -27,11 +29,5 @@ class AbsParser:
     async def get_page_link_articles():
         pass
     
-    # def ParsingTitles():
-    #     pass
-    
-    # def ParsingTexts():
-    #     pass
-    
-    # def ParsingData():
-    #     pass
+    async def get_data_article():
+        pass

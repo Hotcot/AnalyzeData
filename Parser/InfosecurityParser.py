@@ -4,11 +4,11 @@ import datetime
 import time
 
 
-class ScienceParser(AbsParser):
+class InfoSecurityParser(AbsParser):
 
-    __topic_article = "science" # Theme articles
-    __url_science = "https://habr.com/ru/hub/popular_science/"  # Link for parsing
-    __science = 1
+    __topic_article = "infosecurity" # Theme articles
+    __url_security = "https://habr.com/ru/hub/infosecurity/"  # Link for parsing
+    __security = 2
     temp_counter = 0  # delete then
     
     def __init__(self):
@@ -37,7 +37,7 @@ class ScienceParser(AbsParser):
             
             for page in range(1,51):
                 
-                url_pages = f"{self.__url_science}page{page}/"
+                url_pages = f"{self.__url_security}page{page}/"
                 
                 async with session.get(url=url_pages, headers=self.headers) as response:
                     
@@ -51,39 +51,20 @@ class ScienceParser(AbsParser):
                         self.links.append(item.get("href"))
                     await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )
             print(f"[INFO] Process page : {page} \n")                       
-            return self.links
-        
-    # function for get full data of articles
-    # async def get_data_article(self, links):
-        
-    #     async with aiohttp.ClientSession() as session:
-    #         for article in links:                
-    #             url_article = f"{self.url_general}{article}"
-                                
-    #             async with session.get(url=url_article, headers=self.headers) as response:
-                    
-    #                 response_text = await response.text()           
-    #                 soup = BeautifulSoup(response_text, "lxml")
-    #                 self.__get_title_article(soup)
-    #                 self.__get_text_article(soup)
-    #                 # self.__get_date_article(soup)
-    #                 # self.__get_tags_article(soup)
-    #                 # return 0         
+            return self.links     
     
     def get_data_article(self, links):
         
-        for article in links:                
-            url_article = f"{self.url_general}{article}"
-                            
-            req = requests.get(url=url_article, headers=self.headers)
-                
-            # response_text = await response.text()           
+        for article in links:     
+                       
+            url_article = f"{self.url_general}{article}"                            
+            req = requests.get(url=url_article, headers=self.headers)     
             soup = BeautifulSoup(req.text, "lxml")
+            
             self.__get_title_article(soup)
             self.__get_text_article(soup)
             # self.__get_date_article(soup)
-            # self.__get_tags_article(soup)
-            # return 0                  
+            # self.__get_tags_article(soup)               
 
         
     def __get_title_article(self, soup):
@@ -98,7 +79,7 @@ class ScienceParser(AbsParser):
     def __write_date_toCSV(self):        
         for data in range(len(self.links)):
             
-            res = [self.__science, self.titles[data], self.texts[data]]
+            res = [self.__security, self.titles[data], self.texts[data]]
             
             with open("train.csv", "a", encoding="utf-8") as file:
                 writer = csv.writer(file, quoting=csv.QUOTE_ALL) 
