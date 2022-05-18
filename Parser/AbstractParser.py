@@ -14,11 +14,9 @@ class AbsParser:
     links = [] # list of links
     titles = [] # list of titles
     texts = [] # list fo Text
-    data_format_iso = [] # list of Data format Linux
+    # data_format_iso = [] # list of Data format Linux
     data_time = [] # list of Data normal format
     tags = []
-    
-    url_general = "https://habr.com"
     
     # agent for browser
     headers = {
@@ -31,3 +29,4 @@ class AbsParser:
     
     async def get_data_article():
         pass
+        

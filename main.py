@@ -6,8 +6,8 @@ from Parser.ProgrammingParser import ProgrammingParser
 
 
 #pars data for train CNN
-# parserScience = ScienceParser()
-# print("ScienceParser ========================================================")
+parserScience = ScienceParser()
+print("ScienceParser ========================================================")
 # parserInfosecurity = InfoSecurityParser()
 # print("InfoSecurityParser ========================================================")
 # parserDIY = DIYParser()
