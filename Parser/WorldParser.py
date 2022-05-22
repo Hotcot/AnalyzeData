@@ -1,14 +1,14 @@
+from array import ArrayType
 from requests import session
 from .AbstractParser import *
-
 import datetime
 
-class ScienceParser(AbsParser):
+class WorldParser(AbsParser):
     
-    __topic_article = "science" # Theme articles
-    __url_science = "https://www.bbc.com/news/science_and_environment"  # Link for parsing
+    __topic_article = "world" # Theme articles
+    __url_world = "https://www.bbc.com/news/world"  # Link for parsing
     __url_root_link = "https://www.bbc.com"
-    __categories = 4
+    __categories = 1
     temp_counter = 0  # delete then
     
     def __init__(self):
@@ -34,7 +34,7 @@ class ScienceParser(AbsParser):
         async with aiohttp.ClientSession() as session:         
             
             for page in range(1,2):
-                url_pages = self.__url_science             
+                url_pages = self.__url_world            
                 
                 async with session.get(url=url_pages, headers=self.headers) as response:
                     
@@ -44,16 +44,23 @@ class ScienceParser(AbsParser):
                     # archive-list mh-section mh-group                    
                     item_articles = soup.find_all("article", class_="qa-post gs-u-pb-alt+ lx-stream-post gs-u-pt-alt+ gs-u-align-left")
                     
+                    # id_articles = []            
+                                                
                     for item in item_articles:
                         #make check data-parse with db data
+                        id_article = item.get("id")[-7:]
+                        # print(self.__check_value_db(id_article))
+                        for row in s.query(Article.id_article).filter(Article.id_article == id_article):
+                            print(row)
+                        
                         if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):
                             
-                            self.id_article.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href")[-8:])
-                            self.links.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href"))
+                            self.__get_id_article(item)
+                            self.__get_link_article(item)
+                            
                         else:
-                            continue  
-                        
-                        
+                            continue                       
+
                     # await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )
             # print(f"[INFO] Process page : {page}\n")                     
             return self.links       
@@ -74,7 +81,18 @@ class ScienceParser(AbsParser):
                     self.__get_text_article(soup)
                     self.__get_date_article(soup)       
 
+    # def __check_value_db(self, id_article):
+    #     print(f"////////////////////////////////////////////")        
+    #     with engine.connect() as conn:
+    #         for row in conn.execute(select(Article.id_article).where(Article.id_article == id_article)):
+    #             print(f"{row} ////////////////////////////////////////////")
         
+    def __get_id_article(self, item):
+        self.id_article.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href")[-8:])
+        
+    def __get_link_article(self, item):
+        self.links.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href"))
+    
     def __get_title_article(self, soup):
         self.titles.append(soup.find("h1").text)
     

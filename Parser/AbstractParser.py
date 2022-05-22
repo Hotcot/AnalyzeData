@@ -2,11 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 import asyncio
 import aiohttp
+
 import csv
 
 import psycopg2
+from Models.alchemy_decl import engine, Article, s
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import sessionmaker
 
-from Models.config import host, user, password, db_name
+# from Models.config import host, user, password, db_name
 
 
 class AbsParser:
@@ -14,19 +18,12 @@ class AbsParser:
     links = [] # list of links
     titles = [] # list of titles
     texts = [] # list fo Text
-    # data_format_iso = [] # list of Data format Linux
     data_time = [] # list of Data normal format
-    tags = []
+    id_article = []
     
     # agent for browser
     headers = {
         "Accept": "*/*",
-        "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Mobile Safari/537.36 Edg/100.0.1185.36"
+        "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Mobile Safari/537.36 Edg/101.0.1210.47"
     }
-    
-    async def get_page_link_articles():
-        pass
-    
-    async def get_data_article():
-        pass
         

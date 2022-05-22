@@ -3,12 +3,12 @@ from .AbstractParser import *
 
 import datetime
 
-class ScienceParser(AbsParser):
-    
-    __topic_article = "science" # Theme articles
-    __url_science = "https://www.bbc.com/news/science_and_environment"  # Link for parsing
+class BusinessParser(AbsParser):
+
+    __topic_article = "business" # Theme articles
+    __url_business = "https://www.bbc.com/news/business"  # Link for parsing
     __url_root_link = "https://www.bbc.com"
-    __categories = 4
+    __categories = 3
     temp_counter = 0  # delete then
     
     def __init__(self):
@@ -34,7 +34,7 @@ class ScienceParser(AbsParser):
         async with aiohttp.ClientSession() as session:         
             
             for page in range(1,2):
-                url_pages = self.__url_science             
+                url_pages = self.__url_business                
                 
                 async with session.get(url=url_pages, headers=self.headers) as response:
                     
@@ -53,9 +53,8 @@ class ScienceParser(AbsParser):
                         else:
                             continue  
                         
-                        
                     # await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )
-            # print(f"[INFO] Process page : {page}\n")                     
+            print(f"[INFO] Process page : {page}\n")                       
             return self.links       
         
     # function for get full data of articles
@@ -72,15 +71,17 @@ class ScienceParser(AbsParser):
                     
                     self.__get_title_article(soup)
                     self.__get_text_article(soup)
-                    self.__get_date_article(soup)       
+                    self.__get_date_article(soup)
+                    # return 0              
 
         
     def __get_title_article(self, soup):
+        # self.titles.append(soup.find("h1", class_="ssrcss-15xko80-StyledHeading e1fj1fc10").text)
         self.titles.append(soup.find("h1").text)
     
     def __get_text_article(self, soup):
+        # self.texts.append(soup.find("article", class_="ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6").text)
         self.texts.append(soup.find("article").text)
-
         
     def __get_date_article(self, soup):
         temp_date = soup.find("time", {"data-testid": "timestamp"}).get("datetime")
@@ -100,3 +101,6 @@ class ScienceParser(AbsParser):
         self.titles.clear()
         self.texts.clear()
         self.data_time.clear()
+        
+
+       
