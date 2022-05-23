@@ -19,13 +19,15 @@ class WorldParser(AbsParser):
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy()) # потрібно для уникненння внутрішньої помилки при виклику асинхроної функції        
         link_articles = asyncio.run(self.get_page_link_articles()) # pars links articles
         
-        asyncio.run(self.get_data_article(link_articles))
+        if(link_articles != 0):
+            asyncio.run(self.get_data_article(link_articles))
                 
-        self.__write_date_toCSV()     
+            self.__write_date_toCSV()
+            
+            self.__save_data()
         
-        self.__clear_lists() #clear data of global lists
-        
-        
+        self.__clear_lists() #clear data of global lists  
+
         finishTime = datetime.datetime.now() - startTime
         print(finishTime) # ended work programm
 
@@ -40,29 +42,26 @@ class WorldParser(AbsParser):
                     
                     response_text = await response.text()                    
                     soup = BeautifulSoup(response_text, "lxml")
-                    
-                    # archive-list mh-section mh-group                    
-                    item_articles = soup.find_all("article", class_="qa-post gs-u-pb-alt+ lx-stream-post gs-u-pt-alt+ gs-u-align-left")
-                    
-                    # id_articles = []            
-                                                
+                                      
+                    item_articles = soup.find_all("article", class_="qa-post gs-u-pb-alt+ lx-stream-post gs-u-pt-alt+ gs-u-align-left")                             
+                                          
                     for item in item_articles:
-                        #make check data-parse with db data
-                        id_article = item.get("id")[-7:]
-                        # print(self.__check_value_db(id_article))
-                        for row in s.query(Article.id_article).filter(Article.id_article == id_article):
-                            print(row)
-                        
-                        if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):
-                            
-                            self.__get_id_article(item)
-                            self.__get_link_article(item)
-                            
+                        if(len(item.get("id"))==13):
+                            #check data with db
+                            id_article = item.get("id")[-8:]
+                            if(self.__check_repeatability_data_db(id_article)):
+                                # print("//////////////////////false/////////////////")# qa-heading-link lx-stream-post__header-link  
+                                continue                                                             
+                            else:
+                                if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):                                
+                                    self.__get_id_article(item)
+                                    self.__get_link_article(item)                                
+                                else:
+                                    continue                                                           
                         else:
-                            continue                       
-
+                            continue
                     # await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )
-            # print(f"[INFO] Process page : {page}\n")                     
+            # print(f"[INFO] Process page : {page}\n")                   
             return self.links       
         
     # function for get full data of articles
@@ -79,7 +78,7 @@ class WorldParser(AbsParser):
                     
                     self.__get_title_article(soup)
                     self.__get_text_article(soup)
-                    self.__get_date_article(soup)       
+                    print(url_article)      
 
     # def __check_value_db(self, id_article):
     #     print(f"////////////////////////////////////////////")        
@@ -100,9 +99,9 @@ class WorldParser(AbsParser):
         self.texts.append(soup.find("article").text)
 
         
-    def __get_date_article(self, soup):
-        temp_date = soup.find("time", {"data-testid": "timestamp"}).get("datetime")
-        self.data_time.append(datetime.datetime.strptime(f'{temp_date}', '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%d-%m-%Y'))
+    # def __get_date_article(self, soup):
+    #     temp_date = soup.find("time", {"data-testid": "timestamp"}).get("datetime")
+    #     self.data_time.append(datetime.datetime.strptime(f'{temp_date}', '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%d-%m-%Y'))
          
     def __write_date_toCSV(self):        
         for data in range(len(self.links)):
@@ -118,3 +117,22 @@ class WorldParser(AbsParser):
         self.titles.clear()
         self.texts.clear()
         self.data_time.clear()
+        self.id_article.clear()
+        
+    def __save_data(self):
+        for item in range(len(self.links)):
+            article = Article(
+                link = ''.join((self.__url_root_link, self.links[item])),
+                title = self.titles[item],
+                date = datetime.datetime.now(),
+                id_article = self.id_article[item],
+                send_bin = 0
+            )
+            session.add(article)
+        session.commit()
+        
+    def __check_repeatability_data_db(self, id_article):
+        result = 0
+        for instance in session.query(Article).filter(Article.id_article ==  id_article):
+            result = instance.id_article
+        return result

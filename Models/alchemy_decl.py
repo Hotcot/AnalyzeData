@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 # from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 import psycopg2 as psg2
-from sqlalchemy.orm import sessionmaker
+
 
 
 engine = create_engine("postgresql+psycopg2://postgres:programa564742@localhost/postgres", echo=True)
@@ -19,7 +19,7 @@ class Article(Base):
     link = Column(String(255), nullable=False)
     title = Column(String(255), nullable=False)
     date = Column(Date(), nullable=False)
-    id_article = Column(Integer, nullable=False)
+    id_article = Column(String, nullable=False)
     send_bin = Column(Integer, nullable=False)
     
     
@@ -32,6 +32,6 @@ class Article(Base):
 
 Base.metadata.create_all(engine)
 
-session = sessionmaker(bind=engine)
-s = session()
+# session = sessionmaker(bind=engine)
+# s = session()
     

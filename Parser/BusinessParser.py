@@ -19,9 +19,12 @@ class BusinessParser(AbsParser):
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy()) # потрібно для уникненння внутрішньої помилки при виклику асинхроної функції        
         link_articles = asyncio.run(self.get_page_link_articles()) # pars links articles
         
-        asyncio.run(self.get_data_article(link_articles))
+        if(link_articles != 0):
+            asyncio.run(self.get_data_article(link_articles))
                 
-        self.__write_date_toCSV()     
+            self.__write_date_toCSV()
+            
+            self.__save_data()
         
         self.__clear_lists() #clear data of global lists
         
@@ -46,15 +49,23 @@ class BusinessParser(AbsParser):
                     
                     for item in item_articles:
                         #make check data-parse with db data
-                        if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):
-                            
-                            self.id_article.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href")[-8:])
-                            self.links.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href"))
+                        if(len(item.get("id"))==13):
+                            #check data with db
+                            id_article = item.get("id")[-8:]
+                            if(self.__check_repeatability_data_db(id_article)):
+                                # print("//////////////////////false/////////////////")# qa-heading-link lx-stream-post__header-link  
+                                continue                                                             
+                            else:
+                                if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):                                
+                                    self.__get_id_article(item)
+                                    self.__get_link_article(item)                                
+                                else:
+                                    continue                                                           
                         else:
                             continue  
                         
                     # await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )
-            print(f"[INFO] Process page : {page}\n")                       
+            # print(f"[INFO] Process page : {page}\n")                       
             return self.links       
         
     # function for get full data of articles
@@ -71,21 +82,24 @@ class BusinessParser(AbsParser):
                     
                     self.__get_title_article(soup)
                     self.__get_text_article(soup)
-                    self.__get_date_article(soup)
-                    # return 0              
+                    print(url_article)                
 
         
+    def __get_id_article(self, item):
+        self.id_article.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href")[-8:])
+        
+    def __get_link_article(self, item):
+        self.links.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href"))
+        
     def __get_title_article(self, soup):
-        # self.titles.append(soup.find("h1", class_="ssrcss-15xko80-StyledHeading e1fj1fc10").text)
         self.titles.append(soup.find("h1").text)
     
     def __get_text_article(self, soup):
-        # self.texts.append(soup.find("article", class_="ssrcss-pv1rh6-ArticleWrapper e1nh2i2l6").text)
         self.texts.append(soup.find("article").text)
         
-    def __get_date_article(self, soup):
-        temp_date = soup.find("time", {"data-testid": "timestamp"}).get("datetime")
-        self.data_time.append(datetime.datetime.strptime(f'{temp_date}', '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%d-%m-%Y'))
+    # def __get_date_article(self, soup):
+    #     temp_date = soup.find("time", {"data-testid": "timestamp"}).get("datetime")
+    #     self.data_time.append(datetime.datetime.strptime(f'{temp_date}', '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%d-%m-%Y'))
          
     def __write_date_toCSV(self):        
         for data in range(len(self.links)):
@@ -101,6 +115,24 @@ class BusinessParser(AbsParser):
         self.titles.clear()
         self.texts.clear()
         self.data_time.clear()
+        self.id_article.clear()
         
+    def __save_data(self):
+        for item in range(len(self.links)):
+            article = Article(
+                link = ''.join((self.__url_root_link, self.links[item])),
+                title = self.titles[item],
+                date = datetime.datetime.now(),
+                id_article = self.id_article[item],
+                send_bin = 0
+            )
+            session.add(article)
+        session.commit()
+        
+    def __check_repeatability_data_db(self, id_article):
+        result = 0
+        for instance in session.query(Article).filter(Article.id_article ==  id_article):
+            result = instance.id_article
+        return result
 
        
