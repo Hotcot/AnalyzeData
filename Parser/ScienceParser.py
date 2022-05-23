@@ -51,7 +51,6 @@ class ScienceParser(AbsParser):
                             #check data with db
                             id_article = item.get("id")[-8:]
                             if(self.__check_repeatability_data_db(id_article)):
-                                # print("//////////////////////false/////////////////")# qa-heading-link lx-stream-post__header-link  
                                 continue                                                             
                             else:
                                 if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):                                
