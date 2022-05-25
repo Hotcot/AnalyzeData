@@ -136,15 +136,20 @@ class NeyronNetwork:
         print(result)
 
         print("max \n")
+        self.__check_true_answer_classification(result)
 
-        for item in range(len(result)):
-            # print(item)
-            res = np.amax(result[item])
-            print(f"{res}")
-        
-    
     def __select_data_for_classification(self):
         current_data = pd.read_csv('current.csv', 
                         header=None,
                         names=['class', 'title', 'text'])
-        return current_data    
+        return current_data   
+    
+    def __check_true_answer_classification(self, result):
+        for item in range(len(result)):
+            
+            res = np.amax(result[item])
+            
+            for col in range(len(result[item])): 
+                               
+                if(result[item][col] == res):
+                    print(f"{col+1}\n{res}")
