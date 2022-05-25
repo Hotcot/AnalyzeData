@@ -10,8 +10,6 @@ import psycopg2
 from Models.alchemy_decl import Article
 from Models.session_db import session
 
-# from Models.config import host, user, password, db_name
-
 
 class AbsParser:
     
@@ -19,7 +17,7 @@ class AbsParser:
     titles = [] # list of titles
     texts = [] # list fo Text
     data_time = [] # list of Data normal format
-    id_article = []
+    id_article = [] # list of id articles
     
     # agent for browser
     headers = {

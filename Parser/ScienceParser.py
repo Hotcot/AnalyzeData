@@ -5,11 +5,11 @@ import datetime
 
 class ScienceParser(AbsParser):
     
-    __topic_article = "science" # Theme articles
+    # __topic_article = "science" # Theme articles
     __url_science = "https://www.bbc.com/news/science_and_environment"  # Link for parsing
     __url_root_link = "https://www.bbc.com"
     __categories = 4
-    temp_counter = 0  # delete then
+    # temp_counter = 0  # delete then
     
     def __init__(self):
         # start work programm
@@ -93,7 +93,13 @@ class ScienceParser(AbsParser):
         self.titles.append(soup.find("h1").text)
     
     def __get_text_article(self, soup):
-        self.texts.append(soup.find("article").text)
+        text = soup.find_all("div", {"data-component": "text-block"})
+        text_article = ""
+        for item in text:
+            text_article += item.text
+        if(text_article == ""):
+            text_article = soup.find("div", class_= "ssrcss-1a8xtk5-RichTextContainer e5tfeyi1").text
+        self.texts.append(text_article)
 
         
     # def __get_date_article(self, soup):
@@ -105,7 +111,7 @@ class ScienceParser(AbsParser):
             
             res = [self.__categories, self.titles[data], self.texts[data]]
             
-            with open("test.csv", "a", encoding="utf-8", newline='') as file:
+            with open("current.csv", "a", encoding="utf-8", newline='') as file:
                 writer = csv.writer(file, quoting=csv.QUOTE_ALL) 
                 writer.writerow(res)
              
