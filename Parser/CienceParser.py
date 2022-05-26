@@ -3,12 +3,11 @@ from .AbstractParser import *
 
 import datetime
 
-class BusinessParser(AbsParser):
-
-    # __topic_article = "business" # Theme articles
-    __url_business = "https://www.bbc.com/news/business"  # Link for parsing
+class CienceParser(AbsParser):
+    
+    __url_science = "https://www.bbc.com/news/science_and_environment"  # Link for parsing
     __url_root_link = "https://www.bbc.com"
-    __categories = 3
+    __categories = 4
     # temp_counter = 0  # delete then
     
     def __init__(self):
@@ -26,8 +25,7 @@ class BusinessParser(AbsParser):
             
             self.__save_data()
         
-        self.__clear_lists() #clear data of global lists
-        
+        self.__clear_lists() #clear data of global lists  
         
         finishTime = datetime.datetime.now() - startTime
         print(finishTime) # ended work programm
@@ -37,7 +35,7 @@ class BusinessParser(AbsParser):
         async with aiohttp.ClientSession() as session:         
             
             for page in range(1,2):
-                url_pages = self.__url_business                
+                url_pages = self.__url_science             
                 
                 async with session.get(url=url_pages, headers=self.headers) as response:
                     
@@ -55,9 +53,29 @@ class BusinessParser(AbsParser):
                         else:
                             self.__get_id_article(item)
                             self.__get_link_article(item)  
+                            # if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):                                
+                            #     self.__get_id_article(item)
+                            #     self.__get_link_article(item)                                
+                            # else:
+                            #     continue 
+                    # for item in item_articles:
+                    #     if(len(item.get("id"))==13):
+                    #         #check data with db
+                    #         id_article = item.get("id")[-8:]
+                    #         if(self.__check_repeatability_data_db(id_article)):
+                    #             continue                                                             
+                    #         else:
+                    #             if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):                                
+                    #                 self.__get_id_article(item)
+                    #                 self.__get_link_article(item)                                
+                    #             else:
+                    #                 continue                                                           
+                    #     else:
+                    #         continue
+                        
                         
                     # await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )
-            # print(f"[INFO] Process page : {page}\n")                       
+            # print(f"[INFO] Process page : {page}\n")                   
             return self.links       
         
     # function for get full data of articles
@@ -74,7 +92,7 @@ class BusinessParser(AbsParser):
                     
                     self.__get_title_article(soup)
                     self.__get_text_article(soup)
-                    print(url_article)                
+                    print(url_article)         
 
         
     def __get_id_article(self, item):
@@ -128,5 +146,3 @@ class BusinessParser(AbsParser):
         for instance in session.query(Article).filter(Article.id_article ==  id_article):
             result = instance.id_article
         return result
-
-       

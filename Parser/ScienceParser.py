@@ -44,23 +44,16 @@ class ScienceParser(AbsParser):
                     soup = BeautifulSoup(response_text, "lxml")
                     
                     # archive-list mh-section mh-group                    
-                    item_articles = soup.find_all("article", class_="qa-post gs-u-pb-alt+ lx-stream-post gs-u-pt-alt+ gs-u-align-left")
+                    item_articles = soup.find_all("div", class_="gel-layout__item gs-u-pb+@m gel-1/3@m gel-1/4@xl gel-1/3@xxl nw-o-keyline nw-o-no-keyline@m")
                     
                     for item in item_articles:
-                        if(len(item.get("id"))==13):
-                            #check data with db
-                            id_article = item.get("id")[-8:]
-                            if(self.__check_repeatability_data_db(id_article)):
-                                continue                                                             
-                            else:
-                                if(item.find("a").get("class") == ['qa-heading-link', 'lx-stream-post__header-link']):                                
-                                    self.__get_id_article(item)
-                                    self.__get_link_article(item)                                
-                                else:
-                                    continue                                                           
+                        id_article = item.find("a").get("href")[-8:]
+                        link = item.find("a").get("href")
+                        if(self.__check_repeatability_data_db(id_article)):
+                            continue                                                             
                         else:
-                            continue
-                        
+                            self.__get_id_article(item)
+                            self.__get_link_article(item)  
                         
                     # await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )
             # print(f"[INFO] Process page : {page}\n")                     
@@ -84,11 +77,11 @@ class ScienceParser(AbsParser):
 
         
     def __get_id_article(self, item):
-        self.id_article.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href")[-8:])
-        
+        self.id_article.append(item.find("a").get("href")[-8:])
+                                     
     def __get_link_article(self, item):
-        self.links.append(item.find("a", class_="qa-heading-link lx-stream-post__header-link").get("href"))
-        
+        self.links.append(item.find("a").get("href"))
+                
     def __get_title_article(self, soup):
         self.titles.append(soup.find("h1").text)
     
@@ -100,11 +93,6 @@ class ScienceParser(AbsParser):
         if(text_article == ""):
             text_article = soup.find("div", class_= "ssrcss-1a8xtk5-RichTextContainer e5tfeyi1").text
         self.texts.append(text_article)
-
-        
-    # def __get_date_article(self, soup):
-    #     temp_date = soup.find("time", {"data-testid": "timestamp"}).get("datetime")
-    #     self.data_time.append(datetime.datetime.strptime(f'{temp_date}', '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%d-%m-%Y'))
          
     def __write_date_toCSV(self):        
         for data in range(len(self.links)):
