@@ -7,7 +7,7 @@ class ScienceParser(AbsParser):
     
     __url_science = "https://apnews.com/hub/science?utm_source=apnewsnav&utm_medium=navigation"  # Link for parsing
     
-    __url_root_link = "https://apnews.com/"
+    __url_root_link = "https://apnews.com"
     __categories = 4
     
     def __init__(self):
@@ -93,7 +93,7 @@ class ScienceParser(AbsParser):
     def __write_date_toCSV(self):        
         for data in range(len(self.links)):
             
-            res = [self.__categories, self.titles[data], self.id_article[data], self.links[data], self.texts[data]]
+            res = [self.__categories, self.titles[data], self.id_article[data], ''.join((self.__url_root_link, self.links[data])), self.texts[data]]
             
             with open("current.csv", "a", encoding="utf-8", newline='') as file:
                 writer = csv.writer(file, quoting=csv.QUOTE_ALL) 

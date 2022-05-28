@@ -7,27 +7,26 @@ from Parser.SportParser import SportParser
 from CNN.NeyronNetwork import NeyronNetwork
 
 # # clear file with data for classification
-# file_clear = open("current.csv", "w")
-# file_clear.truncate()
-# file_clear.close()
+file_clear = open("current.csv", "w")
+file_clear.truncate()
+file_clear.close()
+print("Clear file for classification")
 
 # #data for classification
-# parserWorld = WorldParser()
-# print("WorldParser =============================")
-# parserSport = SportParser()
-# print("SportParser ============================")
-# parserBusiness = BusinessParser()
-# print("BusinessParser ============================")
-# parserScience = ScienceParser()
-# print("ScienceParser ============================")
+parserWorld = WorldParser()
+print("WorldParser =============================")
+parserSport = SportParser()
+print("SportParser ============================")
+parserBusiness = BusinessParser()
+print("BusinessParser ============================")
+parserScience = ScienceParser()
+print("ScienceParser ============================")
 
-# if(os.stat("current.csv").st_size == 0):
-#     print("True")
-# else:
-#     print("It's a joke")
+if(os.stat("current.csv").st_size == 0):
+    print("True")
+else:
+    #initialize neyron network CNN
+    neyronNetwork = NeyronNetwork()
+    
+    #make telebot
 
-
-
-
-#initialize neyron network CNN
-neyronNetwork = NeyronNetwork()

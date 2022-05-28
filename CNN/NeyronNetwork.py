@@ -9,8 +9,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from Models.alchemy_decl import ClassificData
+from Models.session_db import session
+
 class NeyronNetwork:
-    
+    __result_theme = []
     __num_words = 10000
     __max_news_len = 500
     __nb_classes = 4
@@ -24,7 +27,8 @@ class NeyronNetwork:
          
         tokenizer, model_cnn, model_cnn_save_path = self.__train_and_test_cnn()
         
-        self.__classification_data(tokenizer, model_cnn, model_cnn_save_path)
+        current_data = self.__classification_data(tokenizer, model_cnn, model_cnn_save_path)
+        self.__save_data(current_data)
     
     
     def __train_and_test_cnn(self):
@@ -141,10 +145,11 @@ class NeyronNetwork:
         current_sequences = tokenizer.texts_to_sequences(current_data['text'])
         data = pad_sequences(current_sequences, maxlen=self.__max_news_len)
         result = model_cnn.predict(data)
-        print(result)
-
-        print("max \n")
+        # print(result)
         self.__check_true_answer_classification(result)
+        
+        return current_data
+        
 
     def __select_data_for_classification(self):
         current_data = pd.read_csv('current.csv', 
@@ -160,4 +165,24 @@ class NeyronNetwork:
             for col in range(len(result[item])): 
                                
                 if(result[item][col] == res):
-                    print(f"{col+1}\n{res}")
+                    # print(f"{col+1}\n{res}")
+                     match col+1:
+                        case 1:
+                            self.__result_theme.append(col+1)
+                        case 2:
+                            self.__result_theme.append(col+1)
+                        case 3:
+                            self.__result_theme.append(col+1)
+                        case 4:
+                            self.__result_theme.append(col+1)
+        
+    def __save_data(self, current_data):
+        print(len(self.__result_theme))
+        for item in range(len(self.__result_theme)):            
+            article = ClassificData(
+                id_article = current_data['id_article'][item],
+                link = current_data['link'][item],
+                theme = self.__result_theme[item]
+            )
+            session.add(article)
+        session.commit()

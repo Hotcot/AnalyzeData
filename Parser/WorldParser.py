@@ -6,7 +6,7 @@ import datetime
 class WorldParser(AbsParser):
     
     __url_world = "https://apnews.com/hub/russia-ukraine?utm_source=apnewsnav&utm_medium=featured"  # Link for parsing    
-    __url_root_link = "https://apnews.com/"
+    __url_root_link = "https://apnews.com"
     __categories = 1
     
     def __init__(self):
@@ -92,7 +92,7 @@ class WorldParser(AbsParser):
     def __write_date_toCSV(self):        
         for data in range(len(self.links)):
             
-            res = [self.__categories, self.titles[data], self.id_article[data], self.links[data], self.texts[data]]
+            res = [self.__categories, self.titles[data], self.id_article[data], ''.join((self.__url_root_link, self.links[data])), self.texts[data]]
             
             with open("current.csv", "a", encoding="utf-8", newline='') as file:
                 writer = csv.writer(file, quoting=csv.QUOTE_ALL) 
