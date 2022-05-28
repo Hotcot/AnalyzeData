@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 class NeyronNetwork:
     
     __num_words = 10000
-    __max_news_len = 100
+    __max_news_len = 500
     __nb_classes = 4
     
     #data for training neyron network
@@ -21,8 +21,135 @@ class NeyronNetwork:
                           names = ['class', 'title', 'text'])
     
     def __init__(self):     
-        tokenizer, model_cnn = self.__train_and_test_cnn()
-        self.__classification_data(tokenizer, model_cnn)
+        # tokenizer, model_cnn = self.__train_and_test_cnn()
+        # self.__classification_data(tokenizer, model_cnn)
+        # Максимальное количество слов 
+        num_words = 10000
+        # Максимальная длина новости
+        max_news_len = 30
+        # Количество классов новостей
+        nb_classes = 4
+
+        train = pd.read_csv('train.csv',
+                            header=None,
+                            names=['class', 'title', 'text'])
+
+        # print(train)
+
+        news = train['text']
+        # print(news)
+
+        y_train = utils.to_categorical(train['class'] - 1, nb_classes)
+        # print(y_train)
+
+        tokenizer = Tokenizer(num_words=num_words)
+        # print(tokenizer)
+
+        tokenizer.fit_on_texts(news)
+        # print(tokenizer.word_index)
+
+        sequences = tokenizer.texts_to_sequences(news)
+
+        # print(sequences)
+
+        # print(news[1])
+        # print(sequences[1])
+
+        # print(tokenizer.word_index['making'])
+
+        x_train = pad_sequences(sequences, maxlen=max_news_len)
+
+        # print(x_train[:5])
+        #===================================================================
+        model_cnn = Sequential()
+        model_cnn.add(Embedding(num_words, 32, input_length=max_news_len))
+        model_cnn.add(Conv1D(250, 5, padding='valid', activation='relu'))
+        model_cnn.add(GlobalMaxPooling1D())
+        model_cnn.add(Dense(128, activation='relu'))
+        model_cnn.add(Dense(4, activation='softmax'))
+
+        model_cnn.compile(optimizer='adam', 
+                    loss='categorical_crossentropy', 
+                    metrics=['accuracy'])
+
+        model_cnn.summary()
+        #===================================================================
+
+        model_cnn_save_path = 'best_model_cnn.h5'
+        checkpoint_callback_cnn = ModelCheckpoint(model_cnn_save_path, 
+                                            monitor='val_accuracy',
+                                            save_best_only=True,
+                                            verbose=1)
+
+        history_cnn = model_cnn.fit(x_train, 
+                                    y_train, 
+                                    epochs=5,
+                                    batch_size=128,
+                                    validation_split=0.1,
+                                    callbacks=[checkpoint_callback_cnn])
+
+        # plt.plot(history_cnn.history['accuracy'], 
+        #          label='Доля верных ответов на обучающем наборе')
+        # plt.plot(history_cnn.history['val_accuracy'], 
+        #          label='Доля верных ответов на проверочном наборе')
+        # plt.xlabel('Эпоха обучения')
+        # plt.ylabel('Доля верных ответов')
+        # plt.legend()
+        # plt.show()
+
+        test = pd.read_csv('test.csv', 
+                            header=None, 
+                            names=['class', 'title', 'text'])
+
+
+        test_sequences = tokenizer.texts_to_sequences(test['text'])
+
+        x_test = pad_sequences(test_sequences, maxlen=max_news_len)
+        y_test = utils.to_categorical(test['class'] - 1, nb_classes)
+
+        # # # print(test['class'] - 1)
+
+
+        model_cnn.load_weights(model_cnn_save_path)
+        model_cnn.evaluate(x_test, y_test, verbose=1)
+
+        current = pd.read_csv('current.csv', 
+                            header=None, 
+                            names=['class', 'title', 'text', 'link', 'id_article'])
+
+        current_sequences = tokenizer.texts_to_sequences(current['text'])
+
+
+        data = pad_sequences(current_sequences, maxlen=max_news_len)
+        result = model_cnn.predict(data)
+        print(result)
+
+        # print("Length \n")
+        # print(len(result))
+        # print("i \n")
+        # print(result[1])
+        # print("j \n")
+        # print(result[1][2])
+
+
+        print("max \n")
+
+        for item in range(len(result)):
+            # print(item)
+            res = np.amax(result[item])
+            for col in range(len(result[item])): 
+                                    
+                        if(result[item][col] == res):
+                            print(f"{col+1}\n{res}")
+            
+            
+        # print("min \n")
+        # for item in range(len(result)):
+        #     # print(item)
+        #     res = np.amin(result[item])
+        #     print(f"{res}")
+
+                
     
     
     def __train_and_test_cnn(self):
@@ -58,6 +185,7 @@ class NeyronNetwork:
         print(y_test)
         model_cnn.load_weights(model_cnn_save_path)
         model_cnn.evaluate(x_test, y_test, verbose=1)
+        print("I am here")
         
         return tokenizer, model_cnn
         
@@ -141,7 +269,7 @@ class NeyronNetwork:
     def __select_data_for_classification(self):
         current_data = pd.read_csv('current.csv', 
                         header=None,
-                        names=['class', 'title', 'text'])
+                        names=['class', 'title', 'text', 'link', 'id_article'])
         return current_data   
     
     def __check_true_answer_classification(self, result):

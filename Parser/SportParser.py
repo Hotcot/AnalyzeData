@@ -3,18 +3,14 @@ from .AbstractParser import *
 
 import datetime
 
-class CienceParser(AbsParser):
+class SportParser(AbsParser):
     
-    # __url_science = "https://apnews.com/hub/sports?utm_source=apnewsnav&utm_medium=navigation"  # Link for parsing
-    # __url_science = "https://apnews.com/hub/technology?utm_source=apnewsnav&utm_medium=navigation"  # Link for parsing
-    __url_science = "https://apnews.com/hub/science?utm_source=apnewsnav&utm_medium=navigation"  # Link for parsing
-    
+    __url_sport = "https://apnews.com/hub/sports?utm_source=apnewsnav&utm_medium=navigation"  # Link for parsing   
     __url_root_link = "https://apnews.com/"
-    __categories = 4
-    # temp_counter = 0  # delete then
+    __categories = 2
     
     def __init__(self):
-        # start work programm
+        # start work sport parser
         startTime = datetime.datetime.now()
         print(startTime)                
         
@@ -27,19 +23,19 @@ class CienceParser(AbsParser):
                 
             self.__write_date_toCSV()
             
-            # self.__save_data()
+            self.__save_data()
         
         self.__clear_lists() #clear data of global lists  
         
         finishTime = datetime.datetime.now() - startTime
-        print(finishTime) # ended work programm
+        print(finishTime) # ended work sport parser
 
 
     async def get_page_link_articles(self):
         async with aiohttp.ClientSession() as session:         
             
             for page in range(1,2):
-                url_pages = self.__url_science             
+                url_pages = self.__url_sport             
                 
                 async with session.get(url=url_pages, headers=self.headers) as response:
                     
@@ -50,14 +46,11 @@ class CienceParser(AbsParser):
                     item_articles = soup.find_all("div", {"data-key": "feed-card-wire-story-with-image"})
                     for item in item_articles:
                         id_article = item.find("a").get("href")[-32:]
-                        # link = item.find("a").get("href")
                         if(self.__check_repeatability_data_db(id_article)):
                             continue                                                             
                         else:
                             self.__get_id_article(item)
-                            self.__get_link_article(item) 
-                        
-                        
+                            self.__get_link_article(item)                       
                     # await asyncio.sleep(0.03) # затримка для виключення втрат даних при зверненню на сайт (втрачаются дані при )                
             return self.links       
         
@@ -85,14 +78,7 @@ class CienceParser(AbsParser):
     def __get_title_article(self, soup):
         self.titles.append(soup.find("h1").text)
     
-    def __get_text_article(self, soup):
-        # text = soup.find_all("div", {"data-component": "text-block"})
-        # text_article = ""
-        # for item in text:
-        #     text_article += item.text
-        # if(text_article == ""):
-        #     text_article = soup.find("div", class_= "ssrcss-1a8xtk5-RichTextContainer e5tfeyi1").text
-        
+    def __get_text_article(self, soup):        
         text = soup.find("div", class_="Article")
         text = soup.find_all("p")
         text_article = ""
@@ -105,7 +91,7 @@ class CienceParser(AbsParser):
     def __write_date_toCSV(self):        
         for data in range(len(self.links)):
             
-            res = [self.__categories, self.titles[data], self.texts[data]]
+            res = [self.__categories, self.titles[data], self.id_article[data], self.links[data], self.texts[data]]
             
             with open("current.csv", "a", encoding="utf-8", newline='') as file:
                 writer = csv.writer(file, quoting=csv.QUOTE_ALL) 
