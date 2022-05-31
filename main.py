@@ -5,28 +5,30 @@ from Parser.BusinessParser import BusinessParser
 from Parser.SportParser import SportParser
 
 from CNN.NeyronNetwork import NeyronNetwork
+from SendBot.TelBot import TelBot
 
-# # clear file with data for classification
+# # # clear file with data for classification
 file_clear = open("current.csv", "w")
 file_clear.truncate()
 file_clear.close()
 print("Clear file for classification")
 
 # #data for classification
-parserWorld = WorldParser()
-print("WorldParser =============================")
+# parserWorld = WorldParser()
+# print("WorldParser =============================")
 parserSport = SportParser()
 print("SportParser ============================")
-parserBusiness = BusinessParser()
-print("BusinessParser ============================")
-parserScience = ScienceParser()
-print("ScienceParser ============================")
+# parserBusiness = BusinessParser()
+# print("BusinessParser ============================")
+# parserScience = ScienceParser()
+# print("ScienceParser ============================")
 
 if(os.stat("current.csv").st_size == 0):
-    print("True")
+    print("No data for classification")
 else:
-    #initialize neyron network CNN
+    # initialize neyron network CNN
     neyronNetwork = NeyronNetwork()
-    
-    #make telebot
+    current_data, result_theme = neyronNetwork.get_data()
+    telBot = TelBot(current_data, result_theme)
+
 

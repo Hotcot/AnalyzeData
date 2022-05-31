@@ -31,6 +31,9 @@ class NeyronNetwork:
         self.__save_data(current_data)
     
     
+    def get_data(self):
+        return self.__select_data_for_classification(), self.__result_theme
+        
     def __train_and_test_cnn(self):
         #emit data for training
         news = self.__select_data_for_training()
@@ -168,16 +171,15 @@ class NeyronNetwork:
                     # print(f"{col+1}\n{res}")
                      match col+1:
                         case 1:
-                            self.__result_theme.append(col+1)
+                            self.__result_theme.append("World")
                         case 2:
-                            self.__result_theme.append(col+1)
+                            self.__result_theme.append("Sport")
                         case 3:
-                            self.__result_theme.append(col+1)
+                            self.__result_theme.append("Business")
                         case 4:
-                            self.__result_theme.append(col+1)
+                            self.__result_theme.append("Science/Entertainment")
         
     def __save_data(self, current_data):
-        print(len(self.__result_theme))
         for item in range(len(self.__result_theme)):            
             article = ClassificData(
                 id_article = current_data['id_article'][item],
