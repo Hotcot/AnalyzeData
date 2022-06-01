@@ -43,21 +43,19 @@ class ClassificData(Base):
         self.link = link
         self.theme = theme
         
-# class LogData(Base):
-#     __tablename__ = 'log_data'
+class LogData(Base):
+    __tablename__ = 'log_data'
     
-#     id = Column(Integer, unique = True, primary_key=True)
-#     id_article = Column(String, nullable=False)
-#     link = Column(String(255), nullable=False)
-#     theme = Column(String, nullable=False)
+    id = Column(Integer, unique = True, primary_key=True)
+    start_processing_time = Column(Date(), nullable=False)
+    end_processing_time = Column(Date(), nullable=False)
+    log_message = Column(String, nullable=False)
     
-#     def __init__(self, id_article, link, theme):
-#         self.id_article = id_article
-#         self.link = link
-#         self.theme = theme
+    def __init__(self, start_processing_time, end_processing_time, log_message):
+        self.start_processing_time = start_processing_time
+        self.end_processing_time = end_processing_time
+        self.log_message = log_message
 
 Base.metadata.create_all(engine)
 
-# session = sessionmaker(bind=engine)
-# s = session()
     
