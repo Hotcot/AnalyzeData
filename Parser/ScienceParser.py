@@ -69,8 +69,8 @@ class ScienceParser(AbsParser):
                     response_text = await response.text()           
                     soup = BeautifulSoup(response_text, "lxml")
                     
-                    self.__get_title_article(soup)
-                    self.__get_text_article(soup)
+                    title = self.__get_title_article(soup)
+                    self.__get_text_article(soup, title)
      
     def __get_id_article(self, item):
         self.id_article.append(item.find("a").get("href")[-32:])
@@ -80,15 +80,19 @@ class ScienceParser(AbsParser):
         
     def __get_title_article(self, soup):
         self.titles.append(soup.find("h1").text)
+        return soup.find("h1").text
     
-    def __get_text_article(self, soup):        
+    def __get_text_article(self, soup, title):        
         text = soup.find("div", class_="Article")
         text = soup.find_all("p")
         text_article = ""
         for item in text:
             text_article += item.text
         text_article = text_article
-        self.texts.append(text_article)
+        if(text_article != ""):
+            self.texts.append(text_article)
+        elif(text_article == ""):
+            self.texts.append(title)
          
     def __write_date_toCSV(self):        
         for data in range(len(self.links)):
@@ -113,7 +117,6 @@ class ScienceParser(AbsParser):
                 title = self.titles[item],
                 date = datetime.datetime.now(),
                 id_article = self.id_article[item],
-                send_bin = 0
             )
             session.add(article)
         session.commit()

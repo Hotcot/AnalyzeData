@@ -20,15 +20,13 @@ class Article(Base):
     title = Column(String(255), nullable=False)
     date = Column(Date(), nullable=False)
     id_article = Column(String, nullable=False)
-    send_bin = Column(Integer, nullable=False)
     
     
-    def __init__(self, link, title, date, id_article, send_bin):
+    def __init__(self, link, title, date, id_article):
         self.link = link
         self.title = title
         self.date = date
         self.id_article = id_article
-        self.send_bin = send_bin
         
 class ClassificData(Base):
     __tablename__ = 'classific_data'

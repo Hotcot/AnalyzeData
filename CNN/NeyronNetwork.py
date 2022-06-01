@@ -4,7 +4,6 @@ from tensorflow.keras import utils
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras import utils
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -145,7 +144,7 @@ class NeyronNetwork:
         
         model_cnn.load_weights(model_cnn_save_path)
         
-        current_sequences = tokenizer.texts_to_sequences(current_data['text'])
+        current_sequences = tokenizer.texts_to_sequences(current_data['title'] + current_data['text'])
         data = pad_sequences(current_sequences, maxlen=self.__max_news_len)
         result = model_cnn.predict(data)
         # print(result)
