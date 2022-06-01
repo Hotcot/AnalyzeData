@@ -42,6 +42,19 @@ class ClassificData(Base):
         self.id_article = id_article
         self.link = link
         self.theme = theme
+        
+# class LogData(Base):
+#     __tablename__ = 'log_data'
+    
+#     id = Column(Integer, unique = True, primary_key=True)
+#     id_article = Column(String, nullable=False)
+#     link = Column(String(255), nullable=False)
+#     theme = Column(String, nullable=False)
+    
+#     def __init__(self, id_article, link, theme):
+#         self.id_article = id_article
+#         self.link = link
+#         self.theme = theme
 
 Base.metadata.create_all(engine)
 
