@@ -5,8 +5,8 @@ import time
 
 class TelBot:
     
-    __token = '5318212325:AAFM-3Z-3bJhIkLOGEwN0SNxzcpLfn7B-ig' # telegram token
-    __receiver_id = -1001607488484 # https://api.telegram.org/bot<TOKEN>/getUpdates
+    __token = 'token your telegram bot' # telegram token
+    __receiver_id = [id_channel_telegram] # https://api.telegram.org/bot<TOKEN>/getUpdates
 
     def __init__(self, current_data, result_theme):
         bot = telepot.Bot(self.__token)
